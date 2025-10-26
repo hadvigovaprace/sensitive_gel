@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jak dávkovat prací gel Sensitive?</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;padding:20px;background:#fff;color:#222}
+.box{max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+h2{margin-bottom:16px;font-size:22px;text-align:center}
+label{display:block;margin-top:10px;font-size:15px}
+select{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:6px;font-size:15px}
+button{margin-top:18px;background:#018e34;color:#fff;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;display:block;width:100%}
+.result{margin-top:18px;padding:14px;background:#f0fff4;border:1px solid #d8f2df;border-radius:8px;font-size:16px;text-align:center}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Jak dávkovat prací gel Sensitive?</h2>
+
+  <label>Tvrdost vody
+    <select id="hardness"><option value="">Vyberte</option></select>
+  </label>
+  <label>Stupeň znečištění
+    <select id="dirt"><option value="">Vyberte</option></select>
+  </label>
+  <label>Velikost pračky
+    <select id="size"><option value="">Vyberte</option></select>
+  </label>
+  <label>Náplň pračky
+    <select id="fill"><option value="">Vyberte</option></select>
+  </label>
+
+  <button id="calc">Spočítej</button>
+  <div id="result" class="result" style="display:none"></div>
+</div>
+
+<script>
+const data = [
+  {hardness:"Tvrdá", dirt:"Silné", size:"4,5 kg", fill:"Plná", gelml:50, soft:0, white:0},
+  {hardness:"Měkká", dirt:"Normální", size:"4,5 kg", fill:"Plná", gelml:60, soft:0, white:60},
+  {hardness:"Měkká", dirt:"Silné", size:"4,5 kg", fill:"Plná", gelml:75, soft:0, white:60},
+  {hardness:"Měkká", dirt:"Lehké", size:"4,5 kg", fill:"Poloviční", gelml:35, soft:0, white:0},
+  {hardness:"Měkká", dirt:"Normální", size:"4,5 kg", fill:"Poloviční", gelml:40, soft:0, white:40},
+  {hardness:"Měkká", dirt:"Silné", size:"4,5 kg", fill:"Poloviční", gelml:55, soft:0, white:40},
+  {hardness:"Střední", dirt:"Lehké", size:"4,5 kg", fill:"Plná", gelml:60, soft:0, white:0},
+  {hardness:"Střední", dirt:"Normální", size:"4,5 kg", fill:"Plná", gelml:75, soft:0, white:60},
+  {hardness:"Střední", dirt:"Silné", size:"4,5 kg", fill:"Plná", gelml:100, soft:0, white:60},
+  {hardness:"Střední", dirt:"Lehké", size:"4,5 kg", fill:"Poloviční", gelml:40, soft:0, white:0},
+  {hardness:"Střední", dirt:"Normální", size:"4,5 kg", fill:"Poloviční", gelml:55, soft:0, white:40},
+  {hardness:"Střední", dirt:"Silné", size:"4,5 kg", fill:"Poloviční", gelml:70, soft:0, white:40},
+  {hardness:"Tvrdá", dirt:"Lehké", size:"4,5 kg", fill:"Plná", gelml:60, soft:50, white:0},
+  {hardness:"Tvrdá", dirt:"Normální", size:"4,5 kg", fill:"Plná", gelml:75, soft:50, white:60},
+  {hardness:"Tvrdá", dirt:"Silné", size:"4,5 kg", fill:"Plná", gelml:100, soft:50, white:60},
+  {hardness:"Tvrdá", dirt:"Lehké", size:"4,5 kg", fill:"Poloviční", gelml:40, soft:35, white:0},
+  {hardness:"Tvrdá", dirt:"Normální", size:"4,5 kg", fill:"Poloviční", gelml:55, soft:35, white:40},
+  {hardness:"Tvrdá", dirt:"Silné", size:"4,5 kg", fill:"Poloviční", gelml:70, soft:35, white:40},
+  {hardness:"Měkká", dirt:"Lehké", size:"6 kg", fill:"Plná", gelml:60, soft:0, white:0},
+  {hardness:"Měkká", dirt:"Normální", size:"6 kg", fill:"Plná", gelml:70, soft:0, white:70},
+  {hardness:"Měkká", dirt:"Silné", size:"6 kg", fill:"Plná", gelml:90, soft:0, white:70},
+  {hardness:"Měkká", dirt:"Lehké", size:"6 kg", fill:"Poloviční", gelml:40, soft:0, white:0},
+  {hardness:"Měkká", dirt:"Normální", size:"6 kg", fill:"Poloviční", gelml:50, soft:0, white:50},
+  {hardness:"Měkká", dirt:"Silné", size:"6 kg", fill:"Poloviční", gelml:65, soft:0, white:50},
+  {hardness:"Střední", dirt:"Lehké", size:"6 kg", fill:"Plná", gelml:70, soft:0, white:0},
+  {hardness:"Střední", dirt:"Normální", size:"6 kg", fill:"Plná", gelml:90, soft:0, white:70},
+  {hardness:"Střední", dirt:"Silné", size:"6 kg", fill:"Plná", gelml:120, soft:0, white:70},
+  {hardness:"Střední", dirt:"Lehké", size:"6 kg", fill:"Poloviční", gelml:50, soft:0, white:0},
+  {hardness:"Střední", dirt:"Normální", size:"6 kg", fill:"Poloviční", gelml:65, soft:0, white:50},
+  {hardness:"Střední", dirt:"Silné", size:"6 kg", fill:"Poloviční", gelml:85, soft:0, white:50},
+  {hardness:"Tvrdá", dirt:"Lehké", size:"6 kg", fill:"Plná", gelml:70, soft:60, white:0},
+  {hardness:"Tvrdá", dirt:"Normální", size:"6 kg", fill:"Plná", gelml:90, soft:60, white:70},
+  {hardness:"Tvrdá", dirt:"Silné", size:"6 kg", fill:"Plná", gelml:120, soft:60, white:70},
+  {hardness:"Tvrdá", dirt:"Lehké", size:"6 kg", fill:"Poloviční", gelml:50, soft:40, white:0},
+  {hardness:"Tvrdá", dirt:"Normální", size:"6 kg", fill:"Poloviční", gelml:65, soft:40, white:50},
+  {hardness:"Tvrdá", dirt:"Silné", size:"6 kg", fill:"Poloviční", gelml:85, soft:40, white:50}
+];
+
+// naplnění selectů
+function fillSelect(id,key){
+  const sel=document.getElementById(id);
+  [...new Set(data.map(r=>r[key]))].forEach(v=>{
+    const opt=document.createElement("option");
+    opt.value=v; opt.textContent=v;
+    sel.appendChild(opt);
+  });
+}
+
+fillSelect("hardness","hardness");
+fillSelect("dirt","dirt");
+fillSelect("size","size");
+fillSelect("fill","fill");
+
+// výpočet
+document.getElementById("calc").addEventListener("click",()=>{
+  const h=document.getElementById("hardness").value;
+  const d=document.getElementById("dirt").value;
+  const s=document.getElementById("size").value;
+  const f=document.getElementById("fill").value;
+
+  if(!h || !d || !s || !f){
+    alert("Vyplňte všechna pole."); 
+    return;
+  }
+
+  const row = data.find(r=>r.hardness===h && r.dirt===d && r.size===s && r.fill===f);
+
+  const res = document.getElementById("result");
+  if(!row){
+    res.style.display="block";
+    res.innerHTML="<strong>Kombinace nenalezena.</strong>";
+  } else {
+    res.style.display="block";
+    res.innerHTML=`<strong>Výsledek:</strong><br>
+      Prací gel: <b>${row.gelml}</b> ml<br>
+      Změkčovač: <b>${row.soft}</b> ml<br>
+      Bělící prostředek: <b>${row.white}</b> ml`;
+  }
+});
+</script>
+</body>
+</html>
